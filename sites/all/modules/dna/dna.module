@@ -1,0 +1,72 @@
+<?php
+function get_dna($input) {
+  $pairs = array('A' => 'T', 'T' => 'A', 'C' => 'G', 'G' => 'C');
+  $output = '';
+  $input = strtoupper($input);
+  $input = str_split($input);
+
+  foreach ($input as $char) {
+    $output .= $pairs[$char];
+  }
+
+  return $output;
+}
+
+function dna_menu() {
+    $items['dna'] = array(
+        'title' => 'DNA sequence missing half generator',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('dna_form'),
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM,
+    );
+    $items['dna_success'] = array(
+        'title' => 'DNA sequence generated',
+        'page callback' => 'dna_display',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function dna_form() {
+    $form['input'] = array(
+        '#title' => 'Input DNA sequence',
+        '#type' => 'textfield',
+        '#description' => 'enter sequence with no spaces',
+        '#element_validate' => array('element_validate_dna'),
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'submit',
+    );
+
+    return $form;
+}
+
+function element_validate_dna($element) {
+  $pairs = array('A' => 'T', 'T' => 'A', 'C' => 'G', 'G' => 'C');
+  $input = $element['#value'];
+  $input = strtoupper($input);
+  $input = str_split($input);
+
+  foreach ($input as $char) {
+    if (!array_key_exists($char, $pairs)) {
+      form_error($element, t('Input must be DNA nucleiotide letters such as: "ATCG" with no spaces or punctuation.'));
+    }
+  }
+}
+
+function dna_form_submit($form, &$form_state) {
+    $input= $form_state['values']['input'];
+    $input = strtoupper($input);
+    $_SESSION['input'] = $input;
+    $result = get_dna($input);
+    $_SESSION['result'] = $result;
+    $form_state['redirect'] = 'dna_success';
+}
+
+function dna_display() {
+    $output = $_SESSION['result'];
+    return '<p>Your input: ' . $_SESSION['input'] . '</p><p>Your missing DNA sequence half: <b>' . $output . '</b></p>';
+}

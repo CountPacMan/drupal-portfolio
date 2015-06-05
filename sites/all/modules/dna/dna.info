@@ -1,0 +1,6 @@
+name = DNA other half generator
+description = Input a DNA sequence and this module will return the opposing half.
+package = Biscuited Domain
+core = 7.x
+files[] = dna.module
+files[] = dna.test
