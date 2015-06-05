@@ -1,0 +1,30 @@
+<?php
+function reviews_display_menu() {
+  $items['path-to-ajax/%/%'] = array(
+    'access arguments' => array('access content'),
+    'page callback' => 'reviews_display',
+    'page arguments' => array(1, 2),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function reviews_display($js, $node_id) {
+  $node = node_load($node_id);
+
+  if ($js == 'nojs') {
+    drupal_goto('node/' . $node->nid);
+  }
+
+  // get the render array for node and render it into HTML
+  $build = node_view($node);
+  $html = render($build);
+
+  // prepare ajax to insert the node's HTML into the wrapper
+  $commands = array();
+  $commands[] = ajax_command_html('#reviews_display-ajax-wrapper', $html);
+
+  // render into JSON and print to browser
+  print ajax_render($commands);
+  exit;
+}

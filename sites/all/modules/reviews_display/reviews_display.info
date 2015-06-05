@@ -1,0 +1,5 @@
+name = Reviews Display
+description = Reviews node loader with Ajax
+package = Biscuited Domain
+core = 7.x
+files[] = reviews_display.module
