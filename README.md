@@ -12,7 +12,7 @@ Drupal 7 site as a showcase for custom modules and my sub-subtheme.
 4. Start the web app by pointing your browser to the root (http://localhost:8888/)
 
 #### Drupal admin login instructions
-This is a portfolio site that doens't have user login. To login as the admin, go to (http://localhost:8888/user).
+This is a portfolio site that doesn't have user login. To login as the admin, go to (http://localhost:8888/user).
 Admins created are:
 1. "admin" with password "password"
 
