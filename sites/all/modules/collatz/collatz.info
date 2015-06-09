@@ -1,0 +1,6 @@
+name = Collatz Sequence Module
+description = A unit testing example
+package = COOL Stuff
+core = 7.x
+files[] = collatz.module
+files[] = collatz.test

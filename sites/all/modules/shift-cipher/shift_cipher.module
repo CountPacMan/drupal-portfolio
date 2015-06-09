@@ -1,0 +1,99 @@
+<?php
+function shift_cipher_menu() {
+    $items['shift_cipher'] = array(
+        'title' => 'Shift Cipher',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('shift_cipher_form'),
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM,
+    );
+    $items['shift_cipher_success'] = array(
+        'title' => 'Sucessfully Encoded',
+        'page callback' => 'shift_cipher_success',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function shift_cipher_form() {
+    $form['shift_value'] = array(
+        '#title' => 'shift value',
+        '#type' => 'textfield',
+        '#element_validate' => array('element_validate_integer_positive'),
+        '#description' => t('Enter number of places by which to shift each letter'),
+    );
+    $form['direction'] = array(
+        '#title' => 'direction',
+        '#type' => 'radios',
+        '#options' => array('left' => 'left', 'right' => 'right'),
+        '#description' => t('Choose direction of shift'),
+    );
+    $form['phrase'] = array(
+        '#title' => 'phrase',
+        '#type' => 'textfield',
+        '#element_validate' => array('element_validate_proper_phrase'),
+        '#description' => t('Enter phrase to encrypt'),
+    );
+    $form['submit'] = array(
+        '#value' => 'Encrypt!',
+        '#type' => 'submit',
+    );
+    return $form;
+}
+
+function shift_cipher_form_submit($form, &$form_state) {
+    $shift_value = $_SESSION['shift_value'] = $form_state['values']['shift_value'];
+    $direction = $_SESSION['direction'] = $form_state['values']['direction'];
+    $phrase = $_SESSION['phrase'] = $form_state['values']['phrase'];
+
+    $_SESSION['encrypted_phrase'] = encrypt($shift_value, $direction, $phrase);
+    $form_state['redirect'] = 'shift_cipher_success';
+}
+
+function shift_cipher_success() {
+    return '<p>Your encrypted phrase is ' . $_SESSION['encrypted_phrase'] . '</p>';
+}
+
+function element_validate_proper_phrase($element) {
+    $phrase = $element['#value'];
+    $element_title = $element['#title'];
+
+    $chars = str_split($phrase);
+
+    foreach ($chars as $char) {
+        if (!(ctype_alpha($char) || ctype_space($char) || ctype_punct($char))) {
+            form_error($element, t("$element_title must contain only letters, spaces, and punctuation"));
+        }
+    }
+}
+
+function encrypt($shift_value, $direction, $phrase) {
+    if ($direction == 'left') {
+        $shift_value *= -1;
+    }
+
+    $phrase = strtolower($phrase);
+    $chars = str_split($phrase);
+    $encrypted_phrase = '';
+
+    foreach ($chars as $char) {
+        $ascii = ord($char);
+        $encrypted_phrase .= ctype_alpha($char) ? shift($ascii, $shift_value) : $char;
+    }
+
+    return $encrypted_phrase;
+}
+
+function shift($ascii, $shift_value) {
+    $new_value = $ascii + $shift_value;
+
+    while ($new_value < 97) {
+        $new_value = 123 - (97 - $new_value);
+    }
+    while ($new_value > 122) {
+        $new_value = 96 + ($new_value - 122);
+    }
+
+    return chr($new_value);
+}
